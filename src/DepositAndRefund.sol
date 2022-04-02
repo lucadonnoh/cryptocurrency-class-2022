@@ -2,12 +2,13 @@
 pragma solidity 0.8.13;
 
 contract DepositAndRefund {
-    mapping(address => uint) public balances;
-    mapping(address => uint) public timers;
-    uint constant public lockupPeriod = 1 days;
+    mapping(address => uint256) public balances;
+    mapping(address => uint256) public timers;
+    uint256 public constant lockupPeriod = 1 days;
+
     receive() external payable {}
 
-    function getBalance(address _party) public view returns (uint) {
+    function getBalance(address _party) public view returns (uint256) {
         return balances[_party];
     }
 
@@ -17,9 +18,12 @@ contract DepositAndRefund {
         timers[msg.sender] = block.timestamp;
     }
 
-    function withdraw(uint _amount) public {
+    function withdraw(uint256 _amount) public {
         require(_amount <= balances[msg.sender], "insufficient balance");
-        require(block.timestamp >= timers[msg.sender] + lockupPeriod, "still locked up");
+        require(
+            block.timestamp >= timers[msg.sender] + lockupPeriod,
+            "still locked up"
+        );
         balances[msg.sender] -= _amount;
         payable(msg.sender).transfer(_amount);
     }
